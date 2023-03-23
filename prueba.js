@@ -96,7 +96,6 @@ const randomize = () => {
 }
 
 const playersInGame = JSON.parse(sessionStorage.getItem('players'))
-    console.log(playersInGame)
 
 //creador de cartas
 const generadorCartas = () => {
@@ -182,7 +181,7 @@ const matchCards = (e) =>  {
     //logica
     if (flippedcards.length === 3){
         if (flippedcards[0].getAttribute("name") === flippedcards[1].getAttribute("name") && flippedcards[1].getAttribute("name") === flippedcards[2].getAttribute("name")){
-            playersInGame[0].score++;
+            playersInGame[currentPlayer].score++;
             document.getElementById("jugadores").innerHTML = `
             <p>${playersInGame[0].nombre}: ${playersInGame[0].puntaje}</p>
             <p>${playersInGame[1].nombre}: ${playersInGame[1].puntaje}</p>
@@ -195,7 +194,10 @@ const matchCards = (e) =>  {
         } else {
             flippedcards.forEach((card) => {
                 card.classList.remove("flipped");
-                setTimeout(() => card.classList.remove("togglecard"), 1000);
+                setTimeout(() => {
+                  card.classList.remove("togglecard")
+                  currentPlayer = (currentPlayer + 1) % 3;
+                }, 1000);
             })
         }
     }
