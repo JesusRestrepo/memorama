@@ -1,8 +1,8 @@
 //definiendo variables
 let players = [];
-let marcador = 0;
 let segundos = 0;
 let currentPlayer = 0
+let marcador = 0
 
 const section = document.querySelector("section");
 
@@ -22,9 +22,10 @@ function contadorTiempo() {
 function agregarJugadores() {
     let informacionPlayer = document.getElementsByClassName("info");
     for (var i = 0; i < informacionPlayer.length; i++) {
-      players[i] = informacionPlayer[i].value;
       document.form1.submit();
-      sessionStorage.setItem("players", players)
+      agregarDatosPlayer(informacionPlayer[i].value);
+      console.log(players)
+      sessionStorage.setItem("players", JSON.stringify(players))
     }
   }
   
@@ -34,16 +35,22 @@ function agregarJugadores() {
     if (eleccion == 1) {
       document.querySelector("p").innerHTML =
         '<div id="formulario"><form name="form1" action="/prueba.html">digite nombre: <input <input style="margin-top: 5%;" type="text" class="info"></form></div><button onclick="agregarJugadores()">Continuar</button>';
-      console.log("seleccion:", eleccion);
     } else if (eleccion == 2) {
       document.querySelector("p").innerHTML =
         '<div id="formulario"><form name="form1" action="/prueba.html">digite nombre: <input type="text" <input style="margin-top: 5%;" class="info"><br>digite nombre: <input type="text" class="info"></form></div><button onclick="agregarJugadores()">Continuar</button>';
-      console.log("seleccion:", eleccion);
     } else if (eleccion == 3) {
       document.querySelector("p").innerHTML =
         '<div id="formulario"><form name="form1" action="/prueba.html">digite nombre: <input style="margin-top: 5%;" type="text" class="info"><br>digite nombre: <input type="text" class="info"><br>digite nombre: <input type="text" class="info"></form></div><button onclick="agregarJugadores()">Continuar</button>';
-      console.log("seleccion:", eleccion);
     }
+  }
+
+  function agregarDatosPlayer(nombrePlayer){
+    var nuevoPlayer = {
+      nombre: nombrePlayer,
+      score: 0
+    };
+    console.log(nuevoPlayer)
+    players.push(nuevoPlayer);
   }
 
 
@@ -79,7 +86,6 @@ const getData = () => [
     { imgSrc: "img/img28.png", name:"draw" },
     { imgSrc: "img/img29.png", name:"draw" },
     { imgSrc: "img/img30.png", name:"draw" },
-
 ];
 
 //desorganizar cartas
@@ -88,6 +94,9 @@ const randomize = () => {
     cardData.sort(() => Math.random() - 0.5);
     return cardData;
 }
+
+const playersInGame = JSON.parse(sessionStorage.getItem('players'))
+    console.log(playersInGame)
 
 //creador de cartas
 const generadorCartas = () => {
@@ -117,59 +126,50 @@ const generadorCartas = () => {
         })
     })
     //obteniendo la info del sessionStorage
-    playersInGame = sessionStorage.getItem('players', 'marcador')
-    var coma = ",";
-    var playersInGameArray = playersInGame.split(coma)
-    console.log(playersInGameArray)
-    if(playersInGameArray.length == 1){
+    
+    if(playersInGame.length == 1){
       document.getElementById("jugadores").innerHTML = `
       <div>
         <p id="player1"></p>
-        <p id="marcador">0</p>
       </div>`
       document.getElementById("player1").innerHTML = `
-      <p>${playersInGameArray[0]}</p>
+      <p>${playersInGame[0].nombre}: ${playersInGame[0].score}</p>
       `
-    } else if (playersInGameArray.length == 2){
+    } else if (playersInGame.length == 2){
       document.getElementById("jugadores").innerHTML = `
       <div>
         <p id="player1"></p>
-        <p id="marcador">0</p>
       </div>
       <div>
         <p id="player2"></p>
-        <p id="marcador">0</p>
       </div>
       `
       document.getElementById("player1").innerHTML = `
-      <p>${playersInGameArray[0]}</p>
+      <p>${playersInGame[0].nombre}: ${playersInGame[0].score}</p>
       `
       document.getElementById("player2").innerHTML = `
-      <p>${playersInGameArray[1]}</p>
+      <p>${playersInGame[1].nombre}: ${playersInGame[1].score}</p>
       `
-    } else if (playersInGameArray.length == 3){
+    } else if (playersInGame.length == 3){
       document.getElementById("jugadores").innerHTML = `
       <div>
         <p id="player1"></p>
-        <p id="marcador">0</p>
       </div>
       <div>
         <p id="player2"></p>
-        <p id="marcador">0</p>
       </div>
       <div>
         <p id="player3"></p>
-        <p id="marcador">0</p>
       </div>
       `
       document.getElementById("player1").innerHTML = `
-      <p>${playersInGameArray[0]}</p>
+      <p>${playersInGame[0].nombre}: ${playersInGame[0].score}</p>
       `
       document.getElementById("player2").innerHTML = `
-      <p>${playersInGameArray[1]}</p>
+      <p>${playersInGame[1].nombre}: ${playersInGame[1].score}</p>
       `
       document.getElementById("player3").innerHTML = `
-      <p>${playersInGameArray[2]}</p>
+      <p>${playersInGame[2].nombre}: ${playersInGame[2].score}</p>
       `
     }
 }
@@ -179,19 +179,20 @@ const matchCards = (e) =>  {
     const clickedcard = e.target;
     clickedcard.classList.add("flipped");
     const flippedcards = document.querySelectorAll(".flipped");
-    console.log(flippedcards);
     //logica
     if (flippedcards.length === 3){
         if (flippedcards[0].getAttribute("name") === flippedcards[1].getAttribute("name") && flippedcards[1].getAttribute("name") === flippedcards[2].getAttribute("name")){
-            console.log("match");
-            marcador++;
-            document.getElementById("marcador").innerHTML = marcador;
+            playersInGame[0].score++;
+            document.getElementById("jugadores").innerHTML = `
+            <p>${playersInGame[0].nombre}: ${playersInGame[0].puntaje}</p>
+            <p>${playersInGame[1].nombre}: ${playersInGame[1].puntaje}</p>
+            <p>${playersInGame[2].nombre}: ${playersInGame[2].puntaje}</p>
+            `
             flippedcards.forEach((card) => {
                 card.classList.remove("flipped");
                 card.style.pointerEvents = "none";
             })
         } else {
-            console.log("wrong");
             flippedcards.forEach((card) => {
                 card.classList.remove("flipped");
                 setTimeout(() => card.classList.remove("togglecard"), 1000);
